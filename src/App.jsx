@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import LoginPage from './pages/Login/LoginPage'
+import SignUpPage from './pages/SignUp/SignUpPage'
 function App() {
   const [data, setData] = useState(null)
   useEffect(() => {
@@ -11,7 +12,7 @@ function App() {
       .then(() => console.log(data))
   }, [])
   return (
-    <LoginPage />
+    <div></div>
   )
 }
 
