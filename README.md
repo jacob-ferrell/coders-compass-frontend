@@ -1,0 +1,1 @@
+React template for Django-React project
