@@ -11,6 +11,15 @@ const axiosInstance = axios.create({
   },
 });
 
+const axiosRefresh = axios.create({
+  baseURL,
+  timeout: 5000,
+  headers: {
+    "Content-Type": "application/json",
+    accept: "application/json",
+  },
+});
+
 const getRefreshToken = () => localStorage.getItem("refresh_token");
 
 axiosInstance.interceptors.response.use(
@@ -34,11 +43,21 @@ axiosInstance.interceptors.response.use(
   }
 );
 
+axiosRefresh.interceptors.response.use(
+  response => response,
+  error => {
+    const refresh_token = getRefreshToken();
+    if (error.response?.status === 401 && refresh_token) {
+      return window.location.href = '/logout';
+    }
+  }
+)
+
 async function refreshToken(originalRequest = null) {
   const refresh_token = getRefreshToken();
   if (!refresh_token) return;
   try {
-    const response = await axiosInstance.post("token/refresh/", {
+    const response = await axiosRefresh.post("token/refresh/", {
       refresh: refresh_token,
     });
     const newAccessToken = response.data.access;
