@@ -6,6 +6,7 @@ import axiosInstance from "./axios";
 import Header from "./components/Header";
 import Sidebar from "./components/SideBar";
 import Goal from "./components/Goal";
+import SkillPage from "./pages/SkillPage/SkillPage";
 import mockData from "./data/mockResponse.json";
 import axios from "axios";
 
@@ -43,7 +44,6 @@ function App() {
   }
 
   async function getGoals(skill) {
-
     const res = await axiosInstance.get(
       `skills/goal/?skill=${encodeURIComponent(skill)}`
     );
@@ -75,32 +75,33 @@ function App() {
       <Header />
       <Sidebar getSkills={getSkills} setSelectedSkill={setSelectedSkill} />
       <div className="bg-gray-200  p-5 h-full">
-        {selectedSkill && !skills.isLoading
-          ? skills.data
-              .find((skill) => (skill.id === selectedSkill))
-              .goals?.map((goal, i) => <Goal key={`goal${i}`} goal={goal} skill={selectedSkill}/>)
-          : null}
-        <form className="flex flex-col" onSubmit={handleSubmit}>
-          <label htmlFor="skill">Skill To Learn</label>
-          <input
-            onChange={(e) => setSkillToLearn({ name: e.target.value })}
-            type="text"
-            name="skill"
-          />
-          {goals?.map((goal, i) => (
-            <div className="text-left" key={i}>{`${i + 1}.${
-              goal.description
-            }`}</div>
-          ))}
-          <button className="bg-purple-500" type="submit">
-            Submit
-          </button>
-        </form>
-        {!!goals.length ? (
-          <button className="mt-4" onClick={postGoals}>
-            Save Goals
-          </button>
-        ) : null}
+        {selectedSkill && !skills.isLoading ? (
+          <SkillPage skillID={selectedSkill.id} />
+        ) : (
+          <>
+            <form className="flex flex-col" onSubmit={handleSubmit}>
+              <label htmlFor="skill">Skill To Learn</label>
+              <input
+                onChange={(e) => setSkillToLearn({ name: e.target.value })}
+                type="text"
+                name="skill"
+              />
+              {goals?.map((goal, i) => (
+                <div className="text-left" key={i}>{`${i + 1}.${
+                  goal.description
+                }`}</div>
+              ))}
+              <button className="bg-purple-500" type="submit">
+                Submit
+              </button>
+            </form>
+            {!!goals.length ? (
+              <button className="mt-4" onClick={postGoals}>
+                Save Goals
+              </button>
+            ) : null}
+          </>
+        )}
       </div>
     </div>
   );

@@ -11,7 +11,7 @@ export default function Skill({ skill, setSelectedSkill }) {
     <div
       className="text-left pl-2 cursor-pointer"
       data-id={skill.id}
-      onClick={(e) => setSelectedSkill(skill.id)}
+      onClick={(e) => setSelectedSkill(skill)}
     >
       <div className="flex">
         <div>{skill.name}</div>

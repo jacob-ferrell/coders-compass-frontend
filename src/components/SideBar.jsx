@@ -7,8 +7,9 @@ const Sidebar = ({ getSkills, setSelectedSkill }) => {
   const skills = useQuery("skills", getSkills);
   return (
     <div className="fixed z-0 h-screen bg-gray-500 top-0 left-0 h-screen w-64">
-      <div>My Skills</div>
-      <div className="skills-container">
+      <div className="text-center">My Skills</div>
+      <button onClick={() => setSelectedSkill(null)}>New Skill</button>
+      <div className="skills-container flex flex-col gap-1">
         {skills.isLoading
           ? null
           : skills.data.map((skill, i) => (
