@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-export default function Dropdown({markGoals, deleteGoals}) {
+export default function Dropdown({ markGoals, deleteGoals }) {
   const [isOpen, setIsOpen] = useState(false);
   const toggleDropdown = () => setIsOpen(!isOpen);
   const dropdownRef = useRef(null);
@@ -76,6 +76,18 @@ export default function Dropdown({markGoals, deleteGoals}) {
               id="menu-item-1"
             >
               Mark Incomplete
+            </a>
+          </div>
+          <div className="py-1" role="none">
+            <a
+              href="#"
+              onClick={(e) => e.preventDefault()}
+              className="text-gray-700 block px-4 py-2 text-sm"
+              role="menuitem"
+              tabIndex="-1"
+              id="menu-item-2"
+            >
+              Add Sub-Goals
             </a>
           </div>
           <div className="py-1" role="none">

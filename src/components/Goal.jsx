@@ -1,17 +1,16 @@
 import axiosInstance from "../axios";
 import { useState, useEffect } from "react";
 import { useMutation, useQueryClient, useQuery } from "react-query";
-export default function Goal({ goalID, skillID, handleChange, selectedGoals }) {
+export default function Goal({
+  skill,
+  goal,
+  position,
+  handleChange,
+  selectedGoals,
+}) {
   const queryClient = useQueryClient();
-  const skills = useQuery('skills');
-  const skill = skills.data.find(s => s.id === skillID);
-  const goal = skill.goals.find(g => g.id === goalID)
-  const [checked, setChecked] = useState(goal.complete);
+  const completed = selectedGoals[goal.id];
   const [subGoals, setSubGoals] = useState([]);
-
-  useEffect(() => {
-
-  }, [goal.complete])
 
   const mutation = useMutation(editGoal, {
     onSuccess: () => {
@@ -40,20 +39,20 @@ export default function Goal({ goalID, skillID, handleChange, selectedGoals }) {
 
   return (
     <>
-      <div className="flex gap-5">
-      <input
-            type="checkbox"
-            value={goal.id}
-            checked={selectedGoals[goal.id]}
-            onChange={handleChange}
-            multiple={true}
-          />
-        <div>{goal.description}</div>
-        <input type="checkbox" checked={checked} onChange={mutation.mutate} />
-        <button onClick={() => setSubGoals(getSubGoals())}>
-          Create Sub-Goals
-        </button>
-      </div>
+      <li
+        className="flex gap-5 items-center"
+      >
+        <input
+          type="checkbox"
+          value={goal.id}
+          checked={selectedGoals[goal.id]}
+          onChange={handleChange}
+          multiple={true}
+        />
+        <div className={goal.complete ? "complete" : ""}>
+          {goal.description}
+        </div>
+      </li>
       {!!subGoals.length ? (
         <div className={`${goal.id}-subgoal-container pl-4`}>
           {subGoals?.map((goal) => (

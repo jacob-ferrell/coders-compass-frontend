@@ -1,13 +1,13 @@
 
 
-export default function ProgressBar({ goals, getGoals, percent }) {
+export default function ProgressBar({ percent }) {
 
   const fillStyle = {
     width: `${percent}%`,
   };
 
   return (
-    <div className="w-full bg-gray-100 rounded-full">
+    <div className="bg-gray-100 rounded-full h-3" >
       <div
         className={`h-full bg-green-500 rounded-full rounded-r-none`}
         style={fillStyle}

@@ -18,7 +18,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Routes>
         <Route path="/register" element={<SignUpPage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/" element={<App />} />
+        <Route path="*" element={<App />} />
         <Route path="/logout" element={<Logout />} />
       </Routes>
     </QueryClientProvider>

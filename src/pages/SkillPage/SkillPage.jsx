@@ -1,16 +1,16 @@
+import './SkillPage.css';
 import { useState } from "react";
 import { useMutation, useQueryClient, useQuery } from "react-query";
+import { useParams } from 'react-router-dom';
 import Goal from "../../components/Goal";
 import Dropdown from "../../components/Dropdown";
 import axiosInstance from "../../axios";
 
-export default function SkillPage({ skillID }) {
-  const skills = useQuery('skills');
-  const skill = skills.data.find(s => s.id === skillID);
+export default function SkillPage({skill, style}) {
+  let { id } = useParams();
+  const skills = useQuery("skills");
   const queryClient = useQueryClient();
-  const [selectedGoals, setSelectedGoals] = useState(
-    Object.fromEntries(skill.goals.map((goal) => [goal.id, false]))
-  );
+  const [selectedGoals, setSelectedGoals] = useState(clearGoals);
 
   function handleCheckClick(e) {
     setSelectedGoals((prev) => ({
@@ -42,7 +42,7 @@ export default function SkillPage({ skillID }) {
       cache.setQueryData(queryKey, { ...skillData, goals: updatedGoals });
     },
     onSuccess: () => {
-      console.log('success');
+      setSelectedGoals(clearGoals());
       queryClient.invalidateQueries("skills");
     },
   });
@@ -57,9 +57,13 @@ export default function SkillPage({ skillID }) {
     return res;
   }
 
+  function clearGoals() {
+    return Object.fromEntries(skill.goals.map((goal) => [goal.id, false]));
+  }
+
   return (
-    <>
-      <div className="flex justify-between">
+    <div style={style} className="flex flex-col items-center max-w-screen max-h-screen">
+      <div className="flex justify-between w-100">
         <h1>{skill.name}</h1>
         <div>
           {!Object.keys(selectedGoals).every((goal) => !selectedGoals[goal]) ? (
@@ -70,16 +74,20 @@ export default function SkillPage({ skillID }) {
           ) : null}
         </div>
       </div>
-      {skill.goals?.map((goal, i) => (
-        <div key={`goal${i}`}>
-          <Goal
-            selectedGoals={selectedGoals}
-            goalID={goal.id}
-            skillID={skill.id}
-            handleChange={handleCheckClick}
-          />
-        </div>
-      ))}
-    </>
+      <ul className="goals-list flex flex-col gap-4 flex-wrap">
+        {skill.goals
+          ?.sort((a, b) => a.complete - b.complete)
+          .map((goal, i) => (
+            <Goal
+              key={`goal${i}`}
+              selectedGoals={selectedGoals}
+              goal={goal}
+              skill={skill}
+              handleChange={handleCheckClick}
+              position={i}
+            />
+          ))}
+      </ul>
+    </div>
   );
 }
