@@ -2,10 +2,18 @@ import { useQuery, useQueryClient } from "react-query";
 import ProgressBar from "../../components/ProgressBar";
 import getPercentage from "../../utils/getPercentage";
 import getSkills from "../../api/getSkills";
+import getGeneratedGoals from "../../api/getGeneratedGoals";
 
-export default function SkillsTable(props) {
+export default function SkillsTable({ setCheckedSkills, setIsLoadingGoals, setNewGoals, showAIGoals }) {
   const queryClient = useQueryClient();
   const { isLoading, data } = useQuery("skills", getSkills);
+
+  const handleCheckboxChange = (skillId, checked) => {
+    setCheckedSkills((prev) => ({
+      ...prev,
+      [skillId]: checked,
+    }));
+  };
 
   const rows = !isLoading
     ? data?.map((skill, i) => (
@@ -15,17 +23,33 @@ export default function SkillsTable(props) {
         >
           <td className="w-4 p-4">
             <input
-              id="checkbox-all-search"
+              onChange={(e) => handleCheckboxChange(skill.id, e.target.checked)}
               type="checkbox"
-              class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
             />
-            <label for="checkbox-all-search" class="sr-only">
+            <label className="sr-only">
               checkbox
             </label>
           </td>
-          <td className="px-6 py-4">{skill.name}</td>
+          <td>{skill.name}</td>
           <td>
-            <ProgressBar percent={getPercentage(skill.goals)} />
+            {!!skill.goals.length ? (
+              <ProgressBar percent={getPercentage(skill.goals)} />
+            ) : (
+              <a
+                className="cursor-pointer w-full"
+                onClick={async (e) => {
+                  e.preventDefault();
+                  showAIGoals();
+                  setIsLoadingGoals(true);
+                  const goals = await getGeneratedGoals(skill.name);
+                  setIsLoadingGoals(false);
+                  setNewGoals({skillId: skill.id, skillName: skill.name, goals});
+                }}
+              >
+                Generate Goals
+              </a>
+            )}
           </td>
           <td className="px-6 py-4">{skill.created_at.slice(5, 10)}</td>
           <td className="text-center">{skill.goals.length}</td>

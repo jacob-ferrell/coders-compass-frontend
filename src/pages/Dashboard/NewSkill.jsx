@@ -10,13 +10,14 @@ export default function NewSkill(props) {
     postSkill,
     {
         optimisticUpdate: (oldData, newSkill) => {
-            const newData = {
+            const newData = [
                 ...oldData,
-                
-            }
+                newSkill
+            ];
+            return newData
         }
     }
-  )
+  );
 
   const handleSubmit = e => {
     e.preventDefault();

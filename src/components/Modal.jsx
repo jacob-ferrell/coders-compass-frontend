@@ -1,16 +1,7 @@
 import { useState } from "react";
 
-export default function Modal({ title, children, onClose }) {
-  const [isOpen, setIsOpen] = useState(false);
+export default function Modal({ title, children, openModal, closeModal, isOpen }) {
 
-  function openModal() {
-    setIsOpen(true);
-  }
-
-  function closeModal() {
-    setIsOpen(false);
-    onClose && onClose();
-  }
 
   return (
     <>
@@ -40,7 +31,7 @@ export default function Modal({ title, children, onClose }) {
                 <div className="relative p-6 flex-auto">{children}</div>
                 <div className="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b">
                   <button
-                    className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1"
+                    className="text-pink-600 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1"
                     type="button"
                     onClick={closeModal}
                   >
