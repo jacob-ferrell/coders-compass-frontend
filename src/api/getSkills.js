@@ -1,16 +1,12 @@
 import axiosInstance from "../axios";
+import getGoals from "./getGoals";
 
 export default async function getSkills() {
-  const res = await axiosInstance.get("skills/");
-  for (let skill of res.data) {
-    skill.goals = await getGoals(skill.id);
+  const skills = await axiosInstance.get("skills/");
+  const goals = await getGoals();
+  for (let skill of skills.data) {
+    skill.goals = goals.filter(g => g.skill === skill.id);
   }
-  return res.data;
-}
 
-async function getGoals(skill) {
-  const res = await axiosInstance.get(
-    `skills/goal/?skill=${encodeURIComponent(skill)}`
-  );
-  return res.data;
+  return skills.data;
 }

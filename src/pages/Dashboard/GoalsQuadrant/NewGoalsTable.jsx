@@ -4,6 +4,9 @@ export default function NewGoalsTable({
   goals,
   checkedGoals,
   setCheckedGoals,
+  isAIGoals,
+  skillName,
+  headings,
 }) {
   const [allChecked, setAllChecked] = useState(true);
 
@@ -13,9 +16,7 @@ export default function NewGoalsTable({
 
   const handleSelectAllChange = (e) => {
     const newState = !allChecked;
-    setCheckedGoals(
-      Object.fromEntries(goals.goals.map((g, i) => [i, newState]))
-    );
+    setCheckedGoals(Object.fromEntries(goals.map((g, i) => [i, newState])));
   };
 
   const handleGoalCheckChange = (i) => {
@@ -25,7 +26,7 @@ export default function NewGoalsTable({
     );
   };
 
-  const rows = goals?.goals?.map((g, i) => (
+  const rows = goals?.map((g, i) => (
     <tr
       key={i}
       className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
@@ -58,9 +59,12 @@ export default function NewGoalsTable({
             />
             <label className="sr-only">checkbox</label>
           </th>
-          <th scope="col" className="px-6 py-3">
-            AI Generated Goals for learning {goals.skillName}
-          </th>
+
+          {headings.map((h, i) => (
+            <th key={`h${i}`}scope="col" className="px-6 py-3">
+              {h}
+            </th>
+          ))}
         </tr>
       </thead>
       <tbody>{rows}</tbody>

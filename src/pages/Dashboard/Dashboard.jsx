@@ -1,5 +1,5 @@
-import SkillsQuadrant from "./SkillsQuadrant";
-import GoalsQuadrandt from "./GoalsQuadrant";
+import SkillsQuadrant from "./SkillsQuadrant/SkillsQuadrant";
+import GoalsQuadrandt from "./GoalsQuadrant/GoalsQuadrant";
 import Modal from "../../components/Modal";
 import { useState } from "react";
 
@@ -7,6 +7,7 @@ export default function Dashboard(props) {
   const [isLoadingGoals, setIsLoadingGoals] = useState(false);
   const [showAIGoals, setShowAIGoals] = useState(false);
   const [newGoals, setNewGoals] = useState({});
+  const [selectedSkill, setSelectedSkill] = useState(null);
 
   return (
     <div
@@ -17,6 +18,7 @@ export default function Dashboard(props) {
         setIsLoadingGoals={setIsLoadingGoals}
         setNewGoals={setNewGoals}
         showAIGoals={() => setShowAIGoals(true)}
+        selectSkill={setSelectedSkill}
       />
       <GoalsQuadrandt
         showAIGoals={showAIGoals}
@@ -24,6 +26,8 @@ export default function Dashboard(props) {
         setIsLoadingGoals={setIsLoadingGoals}
         newGoals={newGoals}
         setNewGoals={setNewGoals}
+        closeAIGoals={() => setShowAIGoals(false)}
+        selectedSkill={selectedSkill}
       />
       <div>Q3</div>
       <div>Q4</div>

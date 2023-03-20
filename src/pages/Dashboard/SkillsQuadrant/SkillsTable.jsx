@@ -1,10 +1,16 @@
 import { useQuery, useQueryClient } from "react-query";
-import ProgressBar from "../../components/ProgressBar";
-import getPercentage from "../../utils/getPercentage";
-import getSkills from "../../api/getSkills";
-import getGeneratedGoals from "../../api/getGeneratedGoals";
+import ProgressBar from "../../../components/ProgressBar";
+import getPercentage from "../../../utils/getPercentage";
+import getSkills from "../../../api/getSkills";
+import getGeneratedGoals from "../../../api/getGeneratedGoals";
 
-export default function SkillsTable({ setCheckedSkills, setIsLoadingGoals, setNewGoals, showAIGoals }) {
+export default function SkillsTable({
+  setCheckedSkills,
+  setIsLoadingGoals,
+  setNewGoals,
+  showAIGoals,
+  selectSkill
+}) {
   const queryClient = useQueryClient();
   const { isLoading, data } = useQuery("skills", getSkills);
 
@@ -13,6 +19,11 @@ export default function SkillsTable({ setCheckedSkills, setIsLoadingGoals, setNe
       ...prev,
       [skillId]: checked,
     }));
+  };
+
+  const handleSkillClick = (e, skill) => {
+    e.preventDefault();
+    selectSkill(skill);
   };
 
   const rows = !isLoading
@@ -27,11 +38,17 @@ export default function SkillsTable({ setCheckedSkills, setIsLoadingGoals, setNe
               type="checkbox"
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
             />
-            <label className="sr-only">
-              checkbox
-            </label>
+            <label className="sr-only">checkbox</label>
           </td>
-          <td>{skill.name}</td>
+          <td>
+            <a
+              className="text-violet-800"
+              onClick={(e) => handleSkillClick(e, skill)}
+              href="#"
+            >
+              {skill.name}
+            </a>
+          </td>
           <td>
             {!!skill.goals.length ? (
               <ProgressBar percent={getPercentage(skill.goals)} />
@@ -44,7 +61,11 @@ export default function SkillsTable({ setCheckedSkills, setIsLoadingGoals, setNe
                   setIsLoadingGoals(true);
                   const goals = await getGeneratedGoals(skill.name);
                   setIsLoadingGoals(false);
-                  setNewGoals({skillId: skill.id, skillName: skill.name, goals});
+                  setNewGoals({
+                    skillId: skill.id,
+                    skillName: skill.name,
+                    goals,
+                  });
                 }}
               >
                 Generate Goals
@@ -52,7 +73,9 @@ export default function SkillsTable({ setCheckedSkills, setIsLoadingGoals, setNe
             )}
           </td>
           <td className="px-6 py-4">{skill.created_at.slice(5, 10)}</td>
-          <td className="text-center">{skill.goals.length}</td>
+          <td className="text-center">
+            {skill.goals.filter((g) => !g.complete).length}
+          </td>
         </tr>
       ))
     : null;

@@ -1,16 +1,19 @@
 import { useState, useEffect } from "react";
 import { useQueryClient } from "react-query";
 import LoadingAnimation from "./LoadingAnimation";
-import getRandomPhrase from "../../utils/getRandomPhrase";
+import getRandomPhrase from "../../../utils/getRandomPhrase";
 import NewGoalsTable from "./NewGoalsTable";
-import postGoals from "../../api/postGoals";
-import Modal from "../../components/Modal";
+import postGoals from "../../../api/postGoals";
+import Modal from "../../../components/Modal";
+import getSingleGeneratedGoal from "../../../api/getSingleGeneratedGoal";
 
 export default function GoalsQuadrandt({
   isLoadingGoals,
   setNewGoals,
   newGoals,
   showAIGoals,
+  closeAIGoals,
+  selectedSkill,
 }) {
   const queryClient = useQueryClient();
   const [checkedGoals, setCheckedGoals] = useState({});
@@ -32,6 +35,7 @@ export default function GoalsQuadrandt({
       skill: newGoals.skillId,
     });
     queryClient.invalidateQueries("skills");
+    closeAIGoals();
   };
 
   const handleAddGoalSubmit = async (e) => {
@@ -39,9 +43,24 @@ export default function GoalsQuadrandt({
     setNewGoals((prev) => ({
       ...prev,
       goals: [...prev.goals, addGoalInput],
-    }))
-    setAddGoalInput('');
+    }));
+    setAddGoalInput("");
     setIsAddGoalsModalOpen(false);
+  };
+
+  const handleGenerateGoalClick = async (e) => {
+    e.preventDefault();
+    const body = {
+      other_goals: newGoals.goals,
+      skill_name: newGoals.skillName,
+    };
+    const newGoal = await getSingleGeneratedGoal(body);
+    console.log(newGoal + "poops");
+    setAddGoalInput(newGoal);
+    /* setNewGoals((prev) => ({
+      ...prev,
+      goals: [...prev.goals, addGoalInput],
+    })) */
   };
 
   return (
@@ -75,6 +94,8 @@ export default function GoalsQuadrandt({
                   goal may be similar to an existing goal.
                 </p>
                 <input
+                  className="w-full"
+                  autoFocus
                   type="text"
                   defaultValue={addGoalInput}
                   onChange={(e) => setAddGoalInput(e.target.value)}
@@ -86,7 +107,10 @@ export default function GoalsQuadrandt({
                 >
                   Add Goal
                 </button>
-                <button type="submit" className="bg-violet-500 w-full">
+                <button
+                  className="bg-violet-500 w-full"
+                  onClick={handleGenerateGoalClick}
+                >
                   Generate Goal
                 </button>
               </form>
@@ -100,11 +124,18 @@ export default function GoalsQuadrandt({
           </div>
 
           <NewGoalsTable
-            goals={newGoals}
+            goals={newGoals.goals}
+            skillName={newGoals.skillName}
             setCheckedGoals={setCheckedGoals}
             checkedGoals={checkedGoals}
+            isAIGoals={true}
+            headings={[`AI GENERATED GOALS FOR LEARNING ${newGoals.skillName}`]}
           />
         </>
+      ) : selectedSkill ? (
+        <div>
+          <NewGoalsTable />
+        </div>
       ) : null}
     </div>
   );

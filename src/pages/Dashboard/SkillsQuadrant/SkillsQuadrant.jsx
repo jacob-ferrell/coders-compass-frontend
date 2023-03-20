@@ -1,11 +1,16 @@
 import SkillsTable from "./SkillsTable";
 import SkillsDropdown from "./SkillsDropdown";
-import Modal from "../../components/Modal";
+import Modal from "../../../components/Modal";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import postSkill from "../../api/postSkill";
+import postSkill from "../../../api/postSkill";
 
-export default function SkillsQuadrant({ setIsLoadingGoals, setNewGoals, showAIGoals }) {
+export default function SkillsQuadrant({
+  setIsLoadingGoals,
+  setNewGoals,
+  showAIGoals,
+  selectSkill,
+}) {
   const queryClient = useQueryClient();
   const skills = useQuery("skills");
   const [skillToLearn, setSkillToLearn] = useState("");
@@ -50,6 +55,7 @@ export default function SkillsQuadrant({ setIsLoadingGoals, setNewGoals, showAIG
           <form className="flex flex-col text-gray-600" onSubmit={handleSubmit}>
             <label htmlFor="skill">Skill To Learn</label>
             <input
+              autoFocus
               onChange={(e) => setSkillToLearn(e.target.value)}
               className=""
               type="text"
@@ -66,6 +72,7 @@ export default function SkillsQuadrant({ setIsLoadingGoals, setNewGoals, showAIG
         setCheckedSkills={setCheckedSkills}
         setNewGoals={setNewGoals}
         showAIGoals={showAIGoals}
+        selectSkill={selectSkill}
       />
     </div>
   );

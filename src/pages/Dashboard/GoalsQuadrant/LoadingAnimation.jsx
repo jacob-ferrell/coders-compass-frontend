@@ -1,4 +1,3 @@
-import getRandomPhrase from "../../utils/getRandomPhrase";
 import {useState, useEffect } from 'react';
 
 export default function LoadingAnimation({phrase}) {
