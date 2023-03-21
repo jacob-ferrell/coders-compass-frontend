@@ -9,7 +9,8 @@ export default function SkillsTable({
   setIsLoadingGoals,
   setNewGoals,
   showAIGoals,
-  selectSkill
+  selectSkill,
+  closeAIGoals,
 }) {
   const queryClient = useQueryClient();
   const { isLoading, data } = useQuery("skills", getSkills);
@@ -24,6 +25,7 @@ export default function SkillsTable({
   const handleSkillClick = (e, skill) => {
     e.preventDefault();
     selectSkill(skill);
+    closeAIGoals();
   };
 
   const rows = !isLoading

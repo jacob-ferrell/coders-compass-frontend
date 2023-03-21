@@ -19,6 +19,7 @@ export default function Dashboard(props) {
         setNewGoals={setNewGoals}
         showAIGoals={() => setShowAIGoals(true)}
         selectSkill={setSelectedSkill}
+        closeAIGoals={() => setShowAIGoals(false)}
       />
       <GoalsQuadrandt
         showAIGoals={showAIGoals}

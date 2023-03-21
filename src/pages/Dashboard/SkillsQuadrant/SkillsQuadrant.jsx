@@ -10,6 +10,7 @@ export default function SkillsQuadrant({
   setNewGoals,
   showAIGoals,
   selectSkill,
+  closeAIGoals
 }) {
   const queryClient = useQueryClient();
   const skills = useQuery("skills");
@@ -73,6 +74,7 @@ export default function SkillsQuadrant({
         setNewGoals={setNewGoals}
         showAIGoals={showAIGoals}
         selectSkill={selectSkill}
+        closeAIGoals={closeAIGoals}
       />
     </div>
   );

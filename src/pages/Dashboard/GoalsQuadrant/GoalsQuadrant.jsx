@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
-import { useQueryClient } from "react-query";
+import { useQueryClient, useMutation } from "react-query";
 import LoadingAnimation from "./LoadingAnimation";
 import getRandomPhrase from "../../../utils/getRandomPhrase";
+import GoalsTable from "./GoalsTable";
 import NewGoalsTable from "./NewGoalsTable";
 import postGoals from "../../../api/postGoals";
 import Modal from "../../../components/Modal";
 import getSingleGeneratedGoal from "../../../api/getSingleGeneratedGoal";
+import GoalsDropdown from "./GoalsDropdown";
+import axiosInstance from "../../../axios";
 
 export default function GoalsQuadrandt({
   isLoadingGoals,
@@ -21,11 +24,58 @@ export default function GoalsQuadrandt({
   const [addGoalInput, setAddGoalInput] = useState("");
 
   useEffect(() => {
-    if (newGoals?.goals?.length)
-      setCheckedGoals(
-        Object.fromEntries(newGoals?.goals?.map((g, i) => [i, true]))
-      );
-  }, [newGoals]);
+    if (showAIGoals && newGoals?.goals?.length) {
+      return setAllCheckedGoals(newGoals?.goals, true);
+    }
+    if (selectedSkill?.goals?.length)
+      setAllCheckedGoals(selectedSkill?.goals, false);
+  }, [showAIGoals, newGoals, selectedSkill]);
+
+  function setAllCheckedGoals(goals, value) {
+    setCheckedGoals(
+      Object.fromEntries(
+        goals.map((g, i) => (value ? [i, value] : [g.id, value]))
+      )
+    );
+  }
+
+  async function markGoals(complete) {
+    const goals = selectedSkill.goals
+      .filter((goal) => checkedGoals[goal.id])
+      .map((goal) => ({ ...goal, complete }));
+    const res = await axiosInstance.put("skills/goal/", {
+      goals,
+    });
+    return res;
+  }
+
+  const markGoalsMutation = useMutation(markGoals, {
+    optimisticUpdater: (cache, { goals, complete }) => {
+      const queryKey = ["skills", skill.id];
+      const skillData = cache.getQueryData(queryKey);
+      const updatedGoals = skillData.goals.map((goal) => {
+        if (goals.some((g) => g.id === goal.id)) {
+          return { ...goal, complete };
+        }
+        return goal;
+      });
+      cache.setQueryData(queryKey, { ...skillData, goals: updatedGoals });
+    },
+    onSuccess: () => {
+      setAllCheckedGoals(selectedSkill?.goals, false);
+      queryClient.invalidateQueries("skills");
+    },
+  });
+
+  async function deleteGoals() {
+    const goals = skill.goals
+      .filter((goal) => checkedGoals[goal.id])
+      .map((goal) => goal.id);
+    const res = await axiosInstance.delete(
+      `skills/goal?pk_ids=${goals.join(",")}`
+    );
+    return res;
+  }
 
   const handleSaveClick = async (e) => {
     const res = await postGoals({
@@ -93,7 +143,8 @@ export default function GoalsQuadrandt({
                   another AI generated goal. There's a chance the AI generated
                   goal may be similar to an existing goal.
                 </p>
-                <input
+                <textarea
+                  rows="5"
                   className="w-full"
                   autoFocus
                   type="text"
@@ -122,20 +173,26 @@ export default function GoalsQuadrandt({
               Regenerate
             </button>
           </div>
-
           <NewGoalsTable
             goals={newGoals.goals}
             skillName={newGoals.skillName}
             setCheckedGoals={setCheckedGoals}
             checkedGoals={checkedGoals}
-            isAIGoals={true}
-            headings={[`AI GENERATED GOALS FOR LEARNING ${newGoals.skillName}`]}
           />
         </>
       ) : selectedSkill ? (
-        <div>
-          <NewGoalsTable />
-        </div>
+        <>
+          <GoalsDropdown
+            markGoals={markGoalsMutation.mutate}
+            deleteGoals={deleteGoals}
+            disabled={Object.values(checkedGoals).every((g) => !g)}
+          />
+          <GoalsTable
+            skill={selectedSkill}
+            setCheckedGoals={setCheckedGoals}
+            checkedGoals={checkedGoals}
+          />
+        </>
       ) : null}
     </div>
   );
